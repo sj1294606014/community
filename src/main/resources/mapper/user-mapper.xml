@@ -7,7 +7,7 @@
             id,username,password,salt,email,type,status,activation_code,header_url,create_time
         </sql>
     <sql id="insertFields" >
-         id,username,password,salt,email,type,status,activation_code,header_url,create_time
+         username,password,salt,email,type,status,activation_code,header_url,create_time
     </sql>
 
     <select id="selectById" parameterType="int" resultType="User">
@@ -16,21 +16,21 @@
         where id=#{id}
     </select>
 
-    <select id="selectByName" parameterType="int" resultType="User">
+    <select id="selectByName"  resultType="User">
         select <include refid="selectFields"></include>
         from user
-        where id=#{username}
+        where username=#{username}
     </select>
 
-    <select id="selectByEmail" parameterType="int" resultType="User">
+    <select id="selectByEmail" resultType="User">
         select <include refid="selectFields"></include>
         from user
-        where id=#{email}
+        where email=#{email}
     </select>
 
     <insert id="insertUser" parameterType="User" keyProperty="id">
         insert into  user
-        <include refid="insertFields"></include>
+        (<include refid="insertFields"></include>)
         values
         (
         #{username},#{password},#{salt},#{email},#{type},#{status},#{activationCode},#{headerUrl},#{createTime}
