@@ -1,6 +1,8 @@
 package com.nowcode.community.service;
 
+import com.nowcode.community.dao.LoginTicketMapper;
 import com.nowcode.community.dao.UserMapper;
+import com.nowcode.community.entity.LoginTicket;
 import com.nowcode.community.entity.User;
 import com.nowcode.community.util.CommunityConstant;
 import com.nowcode.community.util.CommunityUtil;
@@ -20,6 +22,8 @@ import java.util.Random;
 @Service
 public class UserService implements CommunityConstant {
 
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
     @Autowired
     private UserMapper userMapper;
 
@@ -102,6 +106,53 @@ public class UserService implements CommunityConstant {
         }else {
             return ACTIVATION_FAILURE;
         }
+    }
+
+    public Map<String,Object> login(String username , String password,long expiredSeconds){
+        Map<String,Object> map=new HashMap<>();
+        //空值处理
+        if(StringUtils.isBlank(username)){
+            map.put("usernameMsg","账号不能为空！");
+            return map;
+        }
+        if(StringUtils.isBlank(password)){
+            map.put("passwordMsg","密码不能为空！");
+            return map;
+        }
+
+        //验证账号
+        User u=userMapper.selectByName(username);
+        if(u == null){
+            map.put("usernameMsg","该账号不存在！");
+            return map;
+        }
+
+        //验证状态
+        if(u.getStatus() == 0){
+            map.put("usernameMsg","该账号未激活！");
+            return map;
+        }
+
+        //验证密码
+        password =CommunityUtil.md5(password+u.getSalt());
+       if(!password.equals(u.getPassword())){
+           map.put("passwordMsg","密码不正确！");
+           return map;
+        }
+        //生成登录凭证
+        LoginTicket loginTicket=new LoginTicket();
+       loginTicket.setUserId(u.getId());
+       loginTicket.setStatus(0);
+       loginTicket.setTicket(CommunityUtil.generateUUID());
+       loginTicket.setExpired(new Date(System.currentTimeMillis()+expiredSeconds*1000));
+       loginTicketMapper.insertLoginTicket(loginTicket);
+       map.put("ticket",loginTicket.getTicket());
+
+        return map;
+    }
+    public void logout(String ticket){
+        loginTicketMapper.updateStatus(ticket,1);
+
     }
 
 
