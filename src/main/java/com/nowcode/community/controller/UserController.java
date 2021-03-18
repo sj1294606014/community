@@ -1,5 +1,6 @@
 package com.nowcode.community.controller;
 
+import com.nowcode.community.annotation.LoginRequired;
 import com.nowcode.community.entity.User;
 import com.nowcode.community.service.UserService;
 import com.nowcode.community.util.CommunityUtil;
@@ -44,11 +45,13 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @RequestMapping(path = "/setting",method = RequestMethod.GET)
     public String getSettingPage(){
         return "/site/setting";
     }
 
+    @LoginRequired
     @RequestMapping(path = "/upload",method =RequestMethod.POST )
     public String uploadHeader(MultipartFile headerImage, Model model){
         if(headerImage ==null){
