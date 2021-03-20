@@ -108,7 +108,6 @@ public class DiscussPostController implements CommunityConstant {
                 commentVo.put("replys",replyVoList);
                 //回复数量
                 int replyCount =commentService.findCommentCount(ENTITY_TYPE_COMMENT,comment.getId());
-                System.out.println("回复数量"+replyCount);
                 commentVo.put("replyCount",replyCount);
 
                 commentVoList.add(commentVo);
