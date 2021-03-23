@@ -2,8 +2,10 @@ package com.nowcode.community.controller;
 
 import com.nowcode.community.annotation.LoginRequired;
 import com.nowcode.community.entity.User;
+import com.nowcode.community.service.FollowService;
 import com.nowcode.community.service.LikeService;
 import com.nowcode.community.service.UserService;
+import com.nowcode.community.util.CommunityConstant;
 import com.nowcode.community.util.CommunityUtil;
 import com.nowcode.community.util.HostHolder;
 import org.apache.ibatis.annotations.Mapper;
@@ -27,7 +29,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping(path = "/user")
-public class UserController {
+public class UserController implements CommunityConstant {
 
     private  static  final Logger logger= LoggerFactory.getLogger(UserController.class);
 
@@ -48,6 +50,9 @@ public class UserController {
 
     @Autowired
     private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
 
     @LoginRequired
     @RequestMapping(path = "/setting",method = RequestMethod.GET)
@@ -123,8 +128,23 @@ public class UserController {
         //点赞数量
         int likeCount = likeService.findUserLikeCount(userId);
         model.addAttribute("likeCount",likeCount);
+
+        //关注数量
+         Long followeeCount = followService.findFolloweeCount(userId,ENTITY_TYPE_USER);
+         model.addAttribute("followeeCount",followeeCount);
+         //粉丝数量
+         Long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER,userId);
+         model.addAttribute("followerCount",followerCount);
+         //是否已关注
+         boolean hasFollowed =false;
+         if(hostHolder.getUser() != null){
+             hasFollowed =followService.hasFollowed(hostHolder.getUser().getId(),ENTITY_TYPE_USER,userId);
+         }
+        model.addAttribute("hasFollowed",hasFollowed);
+
         return  "/site/profile";
      }
+
 
 
 
