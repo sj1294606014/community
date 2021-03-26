@@ -1,7 +1,10 @@
 package com.nowcode.community.controller;
 
+import com.nowcode.community.entity.Event;
 import com.nowcode.community.entity.User;
+import com.nowcode.community.event.EventProducer;
 import com.nowcode.community.service.LikeService;
+import com.nowcode.community.util.CommunityConstant;
 import com.nowcode.community.util.CommunityUtil;
 import com.nowcode.community.util.HostHolder;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,16 +19,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-public class LikeController {
+public class LikeController implements CommunityConstant {
     @Autowired
     private LikeService likeService;
 
     @Autowired
     private  HostHolder hostHolder;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path = "/like",method = RequestMethod.POST)
     @ResponseBody
-    public String like(int entityType ,int entityId,int entityUserId){
+    public String like(int entityType ,int entityId,int entityUserId,int postId){
       User user = hostHolder.getUser();
 
       //实现点赞
@@ -38,6 +44,19 @@ public class LikeController {
         Map<String,Object> map=new HashMap<>();
         map.put("likeCount",likeCount);
         map.put("likeStatus",likeStatus);
+
+        //触发点赞事件
+        if(likeStatus ==1){// =1 点赞
+            Event event =new Event()
+                    .setTopic(TOPIC_LIKE)
+                    .setEntityType(entityType)
+                    .setEntityId(entityId)
+                    .setUserId(user.getId())
+                    .setEntityUserId(entityUserId)
+                    .setData("postId",postId);
+            eventProducer.fireEvent(event);
+        }
+
         return CommunityUtil.getJSONString(0,null,map);
     }
 }

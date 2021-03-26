@@ -18,6 +18,7 @@ import java.util.Map;
 
 @Component
 public class SensitiveFilter {
+    //过滤字符
 
     private  static  final Logger logger= LoggerFactory.getLogger(SensitiveFilter.class);
        //替换符号

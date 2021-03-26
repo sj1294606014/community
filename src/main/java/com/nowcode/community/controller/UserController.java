@@ -8,6 +8,7 @@ import com.nowcode.community.service.UserService;
 import com.nowcode.community.util.CommunityConstant;
 import com.nowcode.community.util.CommunityUtil;
 import com.nowcode.community.util.HostHolder;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/user")
@@ -67,8 +70,8 @@ public class UserController implements CommunityConstant {
             model.addAttribute("error","你还没有选择图片！");
             return "/site/setting";
         }
-       String fileName = headerImage.getOriginalFilename();
-       String suffix = fileName.substring(fileName.lastIndexOf("."));
+       String fileName = headerImage.getOriginalFilename();//文件原始名字
+       String suffix = fileName.substring(fileName.lastIndexOf("."));//获取文件后缀
         if(suffix ==null){
            model.addAttribute("error","文件格式不正确！") ;
             return "/site/setting";
@@ -79,7 +82,7 @@ public class UserController implements CommunityConstant {
         File dest= new File(uploadPath + "/"+fileName);
         try {
             //存储文件
-            headerImage.transferTo(dest);
+            headerImage.transferTo(dest);//把文件写入file
         } catch (IOException e) {
             logger.error("上传文件失败！",e.getMessage());
             throw new RuntimeException("上传文件失败，服务器发生异常！",e);
@@ -97,7 +100,7 @@ public class UserController implements CommunityConstant {
         //服务器存放的路径
         fileName = uploadPath+"/"+fileName;
         //文件后缀
-        String suffix = fileName.substring(fileName.lastIndexOf("."));
+        String suffix = fileName.substring(fileName.lastIndexOf("."));//输出的时候要生命文件格式
         //响应图片
         response.setContentType("image/"+suffix);
         try (
@@ -114,6 +117,24 @@ public class UserController implements CommunityConstant {
             logger.error("读取头像失败！",e.getMessage());
         }
     }
+
+    @LoginRequired
+    @RequestMapping(path = "/updatePassword",method =RequestMethod.POST )
+    public String updatePassword( String oldPassword, String newPassword ,Model model){
+        User user = hostHolder.getUser();
+
+        String password1 =userService.findUserById(user.getId()).getPassword();
+        if(!password1.equals(oldPassword) || StringUtils.isBlank(oldPassword)||StringUtils.isBlank(newPassword)){
+            model.addAttribute("passwordMsg","密码输入不对！");
+        }
+
+        String password =CommunityUtil.md5(newPassword+user.getSalt());
+        int row = userService.updatePassword(user.getId(),password);
+        System.out.println(row);
+
+        return "redirect:/index";
+    }
+
 
     //个人主页
      @RequestMapping(path = "/profile/{userId}",method = RequestMethod.GET)
