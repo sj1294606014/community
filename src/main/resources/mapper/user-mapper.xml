@@ -49,4 +49,52 @@
         update user set password=#{password} where id=#{id}
     </update>
 
+<!--    查询我的回复-->
+    <sql id="selectFields2">
+            c.id,c.user_id,c.entity_type,c.entity_id,c.target_id,c.content,c.status,c.create_time,
+            d.id did,d.user_id duser_id,d.title,d.content dcontent,d.type,d.status dstatus,
+            d.create_time dcreate_time,d.comment_count,d.score
+        </sql>
+    
+    <resultMap id="comment_and_post" type="Comment">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="entityType" column="entity_type"/>
+        <result property="entityId" column="entity_id"/>
+        <result property="targetId" column="target_id"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <association property="discussPost" javaType="DiscussPost">
+            <result property="id" column="did"/>
+            <result property="userId" column="duser_id"/>
+            <result property="title" column="title"/>
+            <result property="content" column="dcontent"/>
+            <result property="type" column="type"/>
+            <result property="status" column="dstatus"/>
+            <result property="createTime" column="dcreate_time"/>
+            <result property="commentCount" column="comment_count"/>
+            <result property="score" column="score"/>
+        </association>
+    </resultMap>
+    <select id="selectCommentAndPost" resultMap="comment_and_post">
+        SELECT  <include refid="selectFields2"></include>
+         FROM comment AS c ,discuss_post AS d
+         WHERE  d.id=c.entity_id
+         AND c.entity_type=1
+         AND c.user_id=#{userId}
+        order by d.type desc,c.create_time desc
+        limit #{offset},#{limit}
+    </select>
+
+    <select id="selectCommentAndPostCount" resultType="int">
+        SELECT  count(d.id)
+        FROM comment AS c ,discuss_post AS d
+        WHERE  d.id=c.entity_id
+        AND c.entity_type=1
+        AND c.user_id=#{userId};
+    </select>
+
+
+    
 </mapper>

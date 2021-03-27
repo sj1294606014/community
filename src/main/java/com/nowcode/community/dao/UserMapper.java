@@ -1,7 +1,10 @@
 package com.nowcode.community.dao;
 
+import com.nowcode.community.entity.Comment;
 import com.nowcode.community.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface UserMapper {
@@ -18,5 +21,8 @@ public interface UserMapper {
     int updateHeader(int id,String headerUrl);
 
     int updatePassword(int id,String password);
+        //查询我的回复
+    List<Comment> selectCommentAndPost(int userId,int offset,int limit);
 
+    int selectCommentAndPostCount(int userId);
 }

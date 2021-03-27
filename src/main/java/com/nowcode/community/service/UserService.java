@@ -2,6 +2,7 @@ package com.nowcode.community.service;
 
 import com.nowcode.community.dao.LoginTicketMapper;
 import com.nowcode.community.dao.UserMapper;
+import com.nowcode.community.entity.Comment;
 import com.nowcode.community.entity.LoginTicket;
 import com.nowcode.community.entity.User;
 import com.nowcode.community.util.CommunityConstant;
@@ -16,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -215,4 +213,13 @@ public class UserService implements CommunityConstant {
         redisTemplate.delete(redisKey);
     }
 
+
+
+    //查询我的回复
+    public List<Comment> findCommentPost(int userId,int offset, int limit){
+       return userMapper.selectCommentAndPost(userId,offset,limit);
+    }
+    public int findCommentPostCount(int userId){
+        return userMapper.selectCommentAndPostCount( userId);
+    }
 }

@@ -1,9 +1,11 @@
 package com.nowcode.community;
 
+import com.nowcode.community.dao.UserMapper;
 import com.nowcode.community.entity.Comment;
 import com.nowcode.community.entity.DiscussPost;
 import com.nowcode.community.service.CommentService;
 import com.nowcode.community.service.DiscussPostService;
+import com.nowcode.community.service.UserService;
 import com.nowcode.community.util.HostHolder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +27,18 @@ public class test {
     private CommentService commentService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
     private HostHolder hostHolder;
+    @Test
+    public void testa(){
+
+        System.out.println(userMapper.selectCommentAndPost(111,0,10));
+    }
 
     @Test
     public void testbySql(){

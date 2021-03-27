@@ -11,6 +11,16 @@ public class Comment {
     private String content;
     private int status;
     private Date createTime;
+    //关联DiscussPost类  在我的回复用到
+    private DiscussPost discussPost;
+
+    public DiscussPost getDiscussPost() {
+        return discussPost;
+    }
+
+    public void setDiscussPost(DiscussPost discussPost) {
+        this.discussPost = discussPost;
+    }
 
     public int getId() {
         return id;
@@ -87,6 +97,7 @@ public class Comment {
                 ", content='" + content + '\'' +
                 ", status=" + status +
                 ", createTime=" + createTime +
+                ", discussPost=" + discussPost +
                 '}';
     }
 }

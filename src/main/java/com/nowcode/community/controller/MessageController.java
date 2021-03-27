@@ -145,7 +145,7 @@ public class MessageController implements CommunityConstant {
     @RequestMapping(path = "/notice/list",method = RequestMethod.GET)
     public String getNotice(Model model){
         User user =hostHolder.getUser();
-        ;
+
         //查询评论类的通知
         Message message =messageService.findLatestNotice(user.getId(),TOPIC_COMMENT);
         Map<String,Object> messageVo =new HashMap<>();
